@@ -1,8 +1,6 @@
 package middleware
 
 import (
-	"qxy-dy/model"
-
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
@@ -31,14 +29,15 @@ func CurrentUser() gin.HandlerFunc {
 // AuthRequired 需要登录
 func AuthRequired() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if user, _ := c.Get("user"); user != nil {
-			if _, ok := user.(*model.User); ok {
-				c.Next()
-				return
-			}
-		}
-
+		// if user, _ := c.Get("user"); user != nil {
+		// 	if _, ok := user.(*model.User); ok {
+		// 		c.Next()
+		// 		return
+		// 	}
+		// }
+		// 在上面写校验用户token的逻辑，之后成功调用Next()
+		c.Next()
 		// c.JSON(200, serializer.CheckLogin())
-		c.Abort()
+		// c.Abort()
 	}
 }
