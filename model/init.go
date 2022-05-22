@@ -21,9 +21,9 @@ func Database(connString string) {
 		log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
 		logger.Config{
 			SlowThreshold:             time.Second, // Slow SQL threshold
-			LogLevel:                  logger.Info, // Log level(这里记得根据需求改一下)
+			LogLevel:                  logger.Info, // 日志等级
 			IgnoreRecordNotFoundError: true,        // Ignore ErrRecordNotFound error for logger
-			Colorful:                  false,       // Disable color
+			Colorful:                  false,       // 警告颜色
 		},
 	)
 
@@ -48,5 +48,6 @@ func Database(connString string) {
 	sqlDB.SetMaxOpenConns(20)
 	DB = db
 
-	migration()
+	// 自动生成表结构，生成后记得注释
+	// migration()
 }

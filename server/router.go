@@ -1,7 +1,6 @@
 package server
 
 import (
-	"os"
 	"qxy-dy/api"
 	"qxy-dy/middleware"
 
@@ -12,16 +11,18 @@ import (
 func NewRouter() *gin.Engine {
 	r := gin.Default()
 
-	// 中间件, 顺序不能改
-	r.Use(middleware.Session(os.Getenv("SESSION_SECRET")))
+	// 配置跨域和登陆校验, 顺序不能改,暂时还没完善
 	r.Use(middleware.Cors())
-	r.Use(middleware.CurrentUser())
+	// r.Use(middleware.CurrentUser())
 
 	// 路由
 	douyin := r.Group("/douyin")
 	{
-		// 一个简单的示例，可供大家学习
-		douyin.POST("ping", api.Ping)
+		// 一个简单的示例，不操作数据库，ping-pong
+		douyin.GET("ping", api.Ping)
+
+		// 另一个简单的示例，根据id获取用户信息
+		douyin.GET("demo", api.Demo)
 
 		// 用户注册
 		douyin.POST("user/register", api.UserRegister)
@@ -36,7 +37,7 @@ func NewRouter() *gin.Engine {
 		auth := douyin.Group("")
 		auth.Use(middleware.AuthRequired())
 		{
-			// auth.GET("user",api)
+			auth.GET("user", api.UserMe)
 
 			// 视频投稿
 			auth.POST("publish/action", api.PublishAction)

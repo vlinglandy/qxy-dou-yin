@@ -1,9 +1,7 @@
 package middleware
 
 import (
-	"qxy-dy/cache"
 	"qxy-dy/model"
-	"qxy-dy/serializer"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
@@ -15,16 +13,16 @@ func CurrentUser() gin.HandlerFunc {
 		var uid string
 		token := c.GetHeader("X-Token")
 		if token != "" {
-			uid, _ = cache.GetUserByToken(token)
+			// uid, _ = cache.GetUserByToken(token)
 		} else {
 			session := sessions.Default(c)
 			uid, _ = session.Get("user_id").(string)
 		}
 		if uid != "" {
-			user, err := model.GetUser(uid)
-			if err == nil {
-				c.Set("user", &user)
-			}
+			// user, err := model.GetUser(uid)
+			// if err == nil {
+			// 	c.Set("user", &user)
+			// }
 		}
 		c.Next()
 	}
@@ -40,7 +38,7 @@ func AuthRequired() gin.HandlerFunc {
 			}
 		}
 
-		c.JSON(200, serializer.CheckLogin())
+		// c.JSON(200, serializer.CheckLogin())
 		c.Abort()
 	}
 }
