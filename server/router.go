@@ -25,10 +25,10 @@ func NewRouter() *gin.Engine {
 		douyin.GET("demo", api.Demo)
 
 		// 用户注册
-		douyin.POST("user/register", api.UserRegister)
+		douyin.POST("user/register/", api.UserRegister)
 
 		// 用户登录
-		douyin.POST("user/login", api.UserLogin)
+		douyin.POST("user/login/", api.UserLogin)
 
 		// 视频流接口
 		douyin.GET("feed", api.GetVideo)
@@ -37,34 +37,34 @@ func NewRouter() *gin.Engine {
 		auth := douyin.Group("")
 		auth.Use(middleware.AuthRequired())
 		{
-			auth.GET("user", api.UserMe)
+			auth.GET("user/", api.UserMe)
 
 			// 视频投稿
-			auth.POST("publish/action", api.PublishAction)
+			auth.POST("publish/action/", api.PublishAction)
 
 			// 发布视频列表
-			auth.GET("publish/list", api.PubishList)
+			auth.GET("publish/list/", api.PubishList)
 
 			// 点赞操作
-			auth.POST("favorite/action", api.FavoriteAction)
+			auth.POST("favorite/action/", api.FavoriteAction)
 
 			// 点赞列表
-			auth.GET("favorite/list", api.FavoriteList)
+			auth.GET("favorite/list/", api.FavoriteList)
 
 			// 评论操作
-			auth.POST("comment/action", api.ComentAction)
+			auth.POST("comment/action/", api.ComentAction)
 
 			// 视频评论列表
-			auth.GET("comment/list", api.CommentList)
+			auth.GET("comment/list/", api.CommentList)
 
 			// 关系操作
-			auth.POST("relation/action", api.RelationAction)
+			auth.POST("relation/action/", api.RelationAction)
 
 			// 用户关注列表
-			auth.GET("relation/follow/list", api.UserFollowList)
+			auth.GET("relation/follow/list/", api.UserFollowList)
 
 			// 用户粉丝列表
-			auth.GET("relation/follower/list", api.UserLoverList)
+			auth.GET("relation/follower/list/", api.UserLoverList)
 		}
 	}
 	return r
