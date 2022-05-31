@@ -11,14 +11,6 @@ import (
 // 这个文件是api的示例文件，大家编写代码可以参考
 
 // 首先定义返回类型，如果返回中的实体已经被定义了就可以直接用写好的实体
-type UserResponse struct {
-	serializer.Response
-	ID            uint   `json:"id"`
-	Username      string `json:"username"`
-	Password      string `json:"password"`
-	FollowCount   int64  `json:"follow_count"`
-	FollowerCount int64  `json:"follower_count"`
-}
 
 func Demo(c *gin.Context) {
 	var user model.User

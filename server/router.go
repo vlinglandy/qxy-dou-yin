@@ -33,7 +33,7 @@ func NewRouter() *gin.Engine {
 		// 视频流接口
 		douyin.GET("feed", api.GetVideo)
 
-		// 需要登录保护的，说白了就是不能用不能用的接口，视频流不登陆也能用
+		// 需要登录保护的，说白了就是不登陆不能用的接口，视频流不登陆也能用
 		auth := douyin.Group("")
 		auth.Use(middleware.AuthRequired())
 		{
