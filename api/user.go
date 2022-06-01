@@ -82,6 +82,7 @@ func UserLogin(c *gin.Context) {
 		if user.Username != "" {
 			// 根据用户信息生成token
 			claims := &middleware.JWTClaims{
+				Id:       uint64(user.ID),
 				Username: username,
 				Password: password,
 			}

@@ -9,4 +9,5 @@ type Video struct {
 	CoverUrl      string
 	FavoriteCount int64
 	CommentCount  int64
+	Title         string
 }
