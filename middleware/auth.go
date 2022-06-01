@@ -19,6 +19,7 @@ const (
 
 type JWTClaims struct {
 	jwt.StandardClaims
+	Id       uint64 `json:"id"`
 	Password string `json:"password"`
 	Username string `json:"username"`
 }
@@ -31,7 +32,10 @@ var (
 // AuthRequired 需要登录
 func AuthRequired() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		tokenstr := c.Query("token")
+		tokenstr, ok := c.GetPostForm("token")
+		if !ok {
+			tokenstr = c.Query("token")
+		}
 		userInfo, err := verifyAction(tokenstr)
 		if err == nil {
 			fmt.Printf("userInfo:%#v", userInfo)
@@ -40,7 +44,7 @@ func AuthRequired() gin.HandlerFunc {
 		} else {
 			c.JSON(200, serializer.Response{
 				StatusCode: 1,
-				StatusMsg:  "用户token校验失败，请登陆",
+				StatusMsg:  "用户token校验失败,请登陆",
 			})
 			c.Abort()
 		}
@@ -102,4 +106,14 @@ func refresh(c *gin.Context) {
 		return
 	}
 	c.String(http.StatusOK, signedToken, ", ", claims.ExpiresAt)
+}
+func GetIdByToken(tokenString string) (uint64, error) {
+	var claims JWTClaims
+	_, err := jwt.ParseWithClaims(tokenString, &claims, func(token *jwt.Token) (interface{}, error) {
+		return []byte(Secret), nil
+	})
+	if err != nil {
+		return 0, errors.New("获取id失败")
+	}
+	return claims.Id, nil
 }

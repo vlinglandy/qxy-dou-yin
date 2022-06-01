@@ -1,16 +1,16 @@
 package server
 
 import (
+	"github.com/gin-gonic/gin"
 	"qxy-dy/api"
 	"qxy-dy/middleware"
-
-	"github.com/gin-gonic/gin"
 )
 
 // NewRouter 路由配置
 func NewRouter() *gin.Engine {
 	r := gin.Default()
-
+	// 静态资源请求映射
+	r.Static("public", "./public")
 	// 配置跨域和登陆校验, 顺序不能改,暂时还没完善
 	r.Use(middleware.Cors())
 	// r.Use(middleware.CurrentUser())
@@ -43,7 +43,7 @@ func NewRouter() *gin.Engine {
 			auth.POST("publish/action/", api.PublishAction)
 
 			// 发布视频列表
-			auth.GET("publish/list/", api.PubishList)
+			auth.GET("publish/list/", api.PublishList)
 
 			// 点赞操作
 			auth.POST("favorite/action/", api.FavoriteAction)
