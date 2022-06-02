@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"qxy-dy/serializer"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -38,6 +39,8 @@ func AuthRequired() gin.HandlerFunc {
 		}
 		userInfo, err := verifyAction(tokenstr)
 		if err == nil {
+			// 这里设置了user的值，之后可以通过c.Get("user")拿到用户信息
+			c.Set("MyId", strconv.FormatUint(userInfo.Id, 10))
 			fmt.Printf("userInfo:%#v", userInfo)
 			c.Next()
 			return

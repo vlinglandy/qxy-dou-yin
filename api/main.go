@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"qxy-dy/serializer"
 
 	"github.com/gin-gonic/gin"
@@ -14,9 +15,12 @@ func Ping(c *gin.Context) {
 	})
 }
 
-// CurrentUser 获取当前用户
-func CurrentUser(c *gin.Context) {
-
+// CurrentUser 获取当前用户id
+func CurrentUser(c *gin.Context) string {
+	value, _ := c.Get("MyId")
+	encoded, _ := json.Marshal(value)
+	myId := string(encoded)
+	return myId
 }
 
 // ErrorResponse 返回错误消息

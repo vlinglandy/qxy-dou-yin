@@ -12,6 +12,15 @@ import (
 
 // 首先定义返回类型，如果返回中的实体已经被定义了就可以直接用写好的实体
 
+type UserResponseDemo struct {
+	serializer.Response
+	ID            uint   `json:"id"`
+	Username      string `json:"username"`
+	Password      string `json:"password"`
+	FollowCount   int64  `json:"follow_count"`
+	FollowerCount int64  `json:"follower_count"`
+}
+
 func Demo(c *gin.Context) {
 	var user model.User
 	// 获取参数
@@ -20,7 +29,7 @@ func Demo(c *gin.Context) {
 	if err := model.DB.First(&user, id).Error; err == nil {
 		fmt.Printf("user:%#v", user)
 		// 利用已经定义好的响应结构体（一定要和接口文档的参数对应），返回响应数据
-		c.JSON(200, UserResponse{
+		c.JSON(200, UserResponseDemo{
 			Response:      serializer.Response{StatusCode: 0},
 			ID:            user.ID,
 			Username:      user.Username,

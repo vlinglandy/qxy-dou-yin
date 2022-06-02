@@ -11,6 +11,19 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type UserService struct{}
+
+func (UserService) isFollow(myId string, hisId string) (isFollow bool, err error) {
+	var count int64
+	model.DB.Model(&model.Follow{}).Where("user_id = ? AND to_user_id = ?", myId, hisId).Count(&count)
+	if count > 0 {
+		return true, nil
+	}
+	return false, nil
+}
+
+var userService UserService
+
 type UserLoginResponse struct {
 	serializer.Response
 	UserId int64  `json:"user_id,omitempty"`
@@ -19,11 +32,8 @@ type UserLoginResponse struct {
 
 type UserResponse struct {
 	serializer.Response
-	ID            uint   `json:"id"`
-	Username      string `json:"username"`
-	Password      string `json:"password"`
-	FollowCount   int64  `json:"follow_count"`
-	FollowerCount int64  `json:"follower_count"`
+	ID   uint            `json:"id"`
+	User serializer.User `json:"user"`
 }
 
 // UserRegister 用户注册接口
@@ -51,6 +61,7 @@ func UserRegister(c *gin.Context) {
 
 	// 根据用户信息生成token
 	claims := &middleware.JWTClaims{
+		Id:       uint64(user.ID),
 		Username: username,
 		Password: password,
 	}
@@ -116,15 +127,21 @@ func UserLogin(c *gin.Context) {
 func UserMe(c *gin.Context) {
 	var user model.User
 	id := c.Query("user_id")
+	myId := CurrentUser(c)
 	if err := model.DB.Model(&model.User{}).Where("id = ?", id).Find(&user).Error; err == nil {
-		c.JSON(http.StatusOK, UserResponse{
-			Response:      serializer.Response{StatusCode: 0, StatusMsg: "获取用户信息成功"},
-			ID:            user.ID,
-			Username:      user.Username,
-			Password:      user.Password,
-			FollowCount:   user.FollowCount,
-			FollowerCount: user.FollowerCount,
-		})
+
+		if isFollow, err := userService.isFollow(myId, id); err == nil {
+			c.JSON(http.StatusOK, UserResponse{
+				Response: serializer.Response{StatusCode: 0, StatusMsg: "获取用户信息成功"},
+				User: serializer.User{
+					Id:            int64(user.ID),
+					Name:          user.Username,
+					FollowCount:   user.FollowCount,
+					FollowerCount: user.FollowerCount,
+					IsFollow:      isFollow,
+				},
+			})
+		}
 	} else {
 		c.JSON(200, serializer.Response{
 			StatusCode: 1,
