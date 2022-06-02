@@ -127,6 +127,7 @@ func UserLogin(c *gin.Context) {
 func UserMe(c *gin.Context) {
 	var user model.User
 	id := c.Query("user_id")
+	// 调用方法获取用户自己的id
 	myId := CurrentUser(c)
 	if err := model.DB.Model(&model.User{}).Where("id = ?", id).Find(&user).Error; err == nil {
 

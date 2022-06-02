@@ -39,7 +39,7 @@ func AuthRequired() gin.HandlerFunc {
 		}
 		userInfo, err := verifyAction(tokenstr)
 		if err == nil {
-			// 这里设置了user的值，之后可以通过c.Get("user")拿到用户信息
+			// 这里设置了user的值，之后可以通过c.Get("MyId")拿到用户信息
 			c.Set("MyId", strconv.FormatUint(userInfo.Id, 10))
 			fmt.Printf("userInfo:%#v", userInfo)
 			c.Next()
