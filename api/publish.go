@@ -3,7 +3,7 @@ package api
 import (
 	"bytes"
 	"fmt"
-	//"github.com/disintegration/imaging"
+	"github.com/disintegration/imaging"
 	"github.com/gin-gonic/gin"
 	ffmpeg "github.com/u2takey/ffmpeg-go"
 	"io"
@@ -19,7 +19,6 @@ import (
 
 type PublishService struct{}
 
-//关于封面，ffmpeg-go官方example跑不起来，封面暂用默认的封面
 func (PublishService) SaveVideo(authorId uint64, playUrl, coverUrl, title string) int64 {
 	// 获取服务器的对外ip
 	conn, err := net.Dial("udp", "8.8.8.8:53")
@@ -31,10 +30,8 @@ func (PublishService) SaveVideo(authorId uint64, playUrl, coverUrl, title string
 	return model.DB.Create(&model.Video{
 		AuthorId: uint(authorId),
 		PlayUrl:  fmt.Sprintf("%s://%s:%s/%s", "http", ip, "8080", playUrl),
-		// 封面直接设置为了默认封面
-		CoverUrl: "https://cdn.pixabay.com/photo/2016/03/27/18/10/bear-1283347_1280.jpg",
-		//CoverUrl: fmt.Sprintf("%s://%s:%s/%s", "http", ip, "8080", coverUrl),
-		Title: title,
+		CoverUrl: fmt.Sprintf("%s://%s:%s/%s", "http", ip, "8080", coverUrl),
+		Title:    title,
 	}).RowsAffected
 }
 
@@ -109,15 +106,9 @@ func PublishAction(c *gin.Context) {
 	filename := filepath.Base(data.Filename)
 	saveFile := fmt.Sprintf("public/%d_%s", id, filename)
 	sf := []byte(saveFile)
-	saveFileJepg := string(sf[:(len(sf)-4)]) + ".jepg"
+	saveFileJepg := string(sf[:(len(sf)-4)]) + ".jpeg"
 
-	// 获取参数title, 注意：这个title是存在text中的
 	title, _ := c.GetPostForm("title")
-
-	//截取某帧
-	//reader := ExampleReadFrameAsJpeg(saveFile, 1)
-	//img, err := imaging.Decode(reader)
-	//err = imaging.Save(img, saveFileJepg)
 
 	if err := c.SaveUploadedFile(data, saveFile); err != nil {
 		c.JSON(http.StatusOK, serializer.Response{
@@ -126,6 +117,17 @@ func PublishAction(c *gin.Context) {
 		})
 		return
 	} else {
+		//截取某帧
+		reader := ExampleReadFrameAsJpeg(saveFile, 1)
+		img, err := imaging.Decode(reader)
+		err = imaging.Save(img, saveFileJepg)
+		if err != nil {
+			c.JSON(http.StatusOK, serializer.Response{
+				StatusCode: 1,
+				StatusMsg:  "截图失败",
+			})
+			return
+		}
 		if row := publishService.SaveVideo(id, saveFile, saveFileJepg, title); row == 0 {
 			c.JSON(http.StatusOK, serializer.Response{
 				StatusCode: 1,
