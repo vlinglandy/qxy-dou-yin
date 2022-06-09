@@ -22,7 +22,16 @@ func (UserService) isFollow(myId string, hisId string) (isFollow bool, err error
 	return false, nil
 }
 
-var userService UserService
+func (UserService) isFollowByUint(myId string, hisId uint) (isFollow bool, err error) {
+	var count int64
+	model.DB.Model(&model.Follow{}).Where("user_id = ? AND to_user_id = ?", myId, hisId).Count(&count)
+	if count > 0 {
+		return true, nil
+	}
+	return false, nil
+}
+
+var MyUserService UserService
 
 type UserLoginResponse struct {
 	serializer.Response
@@ -32,7 +41,6 @@ type UserLoginResponse struct {
 
 type UserResponse struct {
 	serializer.Response
-	ID   uint            `json:"id"`
 	User serializer.User `json:"user"`
 }
 
@@ -131,7 +139,7 @@ func UserMe(c *gin.Context) {
 	myId := CurrentUser(c)
 	if err := model.DB.Model(&model.User{}).Where("id = ?", id).Find(&user).Error; err == nil {
 
-		if isFollow, err := userService.isFollow(myId, id); err == nil {
+		if isFollow, err := MyUserService.isFollow(myId, id); err == nil {
 			c.JSON(http.StatusOK, UserResponse{
 				Response: serializer.Response{StatusCode: 0, StatusMsg: "获取用户信息成功"},
 				User: serializer.User{
