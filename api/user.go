@@ -22,6 +22,15 @@ func (UserService) isFollow(myId string, hisId string) (isFollow bool, err error
 	return false, nil
 }
 
+func (UserService) isFollowByUint(myId string, hisId uint) (isFollow bool, err error) {
+	var count int64
+	model.DB.Model(&model.Follow{}).Where("user_id = ? AND to_user_id = ?", myId, hisId).Count(&count)
+	if count > 0 {
+		return true, nil
+	}
+	return false, nil
+}
+
 var MyUserService UserService
 
 type UserLoginResponse struct {
