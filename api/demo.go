@@ -10,7 +10,7 @@ import (
 
 // 这个文件是api的示例文件，大家编写代码可以参考
 
-// 首先定义返回类型，如果返回中的实体已经被定义了就可以直接用写好的实体
+// UserResponse 首先定义返回类型，如果返回中的实体已经被定义了就可以直接用写好的实体
 
 type UserResponseDemo struct {
 	serializer.Response
