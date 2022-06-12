@@ -40,6 +40,14 @@ func (FeedService) Feed(userId uint64, latestTime int64) []serializer.Video {
 			model.DB.Model(&model.Favorite{}).Where("user_id = ? and video_id = ?", userId, video.ID).Count(&isFavoriteCount)
 		}
 
+		// 视频点赞数目
+		var FavoriteCount int64
+		model.DB.Model(&model.Favorite{}).Where("video_id = ?",video.ID).Count(&FavoriteCount)
+
+		// 视频评论数目
+		var CommentCount int64
+		model.DB.Model(&model.Comment{}).Where("video_id = ?",video.ID).Count(&CommentCount)
+
 		playurl, _ := util.ReplaceIP(video.PlayUrl, ip)
 		coverurl, _ := util.ReplaceIP(video.CoverUrl, ip)
 		Videos = append(Videos, serializer.Video{
@@ -47,8 +55,8 @@ func (FeedService) Feed(userId uint64, latestTime int64) []serializer.Video {
 			Author:        author,
 			PlayUrl:       playurl,
 			CoverUrl:      coverurl,
-			FavoriteCount: video.FavoriteCount,
-			CommentCount:  video.CommentCount,
+			FavoriteCount: FavoriteCount,
+			CommentCount:  CommentCount,
 			IsFavorite:    isFavoriteCount > 0,
 			Title:         video.Title,
 		})
