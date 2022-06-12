@@ -5,6 +5,7 @@ import (
 	"qxy-dy/middleware"
 	"qxy-dy/model"
 	"qxy-dy/serializer"
+	"qxy-dy/util"
 
 	"strconv"
 	"time"
@@ -23,7 +24,7 @@ func (FeedService) Feed(userId uint64, latestTime int64) []serializer.Video {
 	var videos []model.Video
 	var Videos []serializer.Video
 	model.DB.Model(&model.Video{}).Where("created_at > 0").Order("created_at DESC").Limit(30).Find(&videos)
-
+	ip := util.GetIp()
 	for _, video := range videos {
 		var author serializer.User
 		// 通过AuthorId查找视频作者相关信息
@@ -39,11 +40,13 @@ func (FeedService) Feed(userId uint64, latestTime int64) []serializer.Video {
 			model.DB.Model(&model.Favorite{}).Where("user_id = ? and video_id = ?", userId, video.ID).Count(&isFavoriteCount)
 		}
 
+		playurl, _ := util.ReplaceIP(video.PlayUrl, ip)
+		coverurl, _ := util.ReplaceIP(video.CoverUrl, ip)
 		Videos = append(Videos, serializer.Video{
 			Id:            int64(video.ID),
 			Author:        author,
-			PlayUrl:       video.PlayUrl,
-			CoverUrl:      video.CoverUrl,
+			PlayUrl:       playurl,
+			CoverUrl:      coverurl,
 			FavoriteCount: video.FavoriteCount,
 			CommentCount:  video.CommentCount,
 			IsFavorite:    isFavoriteCount > 0,
