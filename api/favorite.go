@@ -201,12 +201,16 @@ func FavoriteList(c *gin.Context) {
 			author.IsFollow = isFollowCount > 0
 		}
 
+		// 点赞数目：
+		var FavoriteCount int64
+		model.DB.Model(&model.Favorite{}).Where("video_id = ?",video.ID).Count(&FavoriteCount)
+
 		videoInfos = append(videoInfos, serializer.Video{
 			Id:            int64(video.ID),
 			Author:        author,
 			PlayUrl:       video.PlayUrl,
 			CoverUrl:      video.CoverUrl,
-			FavoriteCount: video.FavoriteCount,
+			FavoriteCount: FavoriteCount,
 			CommentCount:  video.CommentCount,
 			IsFavorite:    true,
 			Title:         video.Title,
