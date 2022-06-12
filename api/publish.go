@@ -7,26 +7,20 @@ import (
 	"github.com/gin-gonic/gin"
 	ffmpeg "github.com/u2takey/ffmpeg-go"
 	"io"
-	"net"
 	"net/http"
 	"os"
 	"path/filepath"
 	"qxy-dy/middleware"
 	"qxy-dy/model"
 	"qxy-dy/serializer"
-	"strings"
+	"qxy-dy/util"
 )
 
 type PublishService struct{}
 
 func (PublishService) SaveVideo(authorId uint64, playUrl, coverUrl, title string) int64 {
 	// 获取服务器的对外ip
-	conn, err := net.Dial("udp", "8.8.8.8:53")
-	if err != nil {
-		return 0
-	}
-	localAddr := conn.LocalAddr().(*net.UDPAddr)
-	ip := strings.Split(localAddr.String(), ":")[0]
+	ip := util.GetIp()
 	return model.DB.Create(&model.Video{
 		AuthorId: uint(authorId),
 		PlayUrl:  fmt.Sprintf("%s://%s:%s/%s", "http", ip, "8080", playUrl),
